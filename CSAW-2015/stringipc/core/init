@@ -1,0 +1,26 @@
+#!/bin/sh
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+mount -t devtmpfs none /dev
+/sbin/mdev -s
+mkdir -p /dev/pts
+mount -vt devpts -o gid=4,mode=620 none /dev/pts
+cat /proc/kallsyms > /tmp/kallsyms
+echo 1 > /proc/sys/kernel/kptr_restrict
+echo 1 > /proc/sys/kernel/dmesg_restrict
+insmod stringipc.ko
+chmod 777 /dev/csaw
+ifconfig lo 127.0.0.1
+route add -net 127.0.0.0 netmask 255.255.255.0 lo
+ifconfig eth0 192.168.10.0
+route add -net 192.168.10.0 netmask 255.255.255.0 eth0
+nohup /sudo_me &
+echo "this is a sample flag" >> /flag
+chmod 600 flag
+setsid /bin/cttyhack setuidgid 1000 /bin/sh
+ 
+echo 'sh end!\n'
+umount /proc
+umount /sys
+
+poweroff -d 0  -f
